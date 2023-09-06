@@ -1,38 +1,69 @@
 import sqlite3
-import sys
+import click
+import subprocess
 
-def describe_table(conn, table_name):
-    cursor = conn.cursor()
-    cursor.execute(f"PRAGMA table_info({table_name})")
-    columns = [row[1] for row in cursor.fetchall()]
-    return columns
+def describe_table_schema(db_filename, table_name):
+    """Outputs the table schema using the sqlite3 CLI tool."""
 
-def sample_data(conn, table_name):
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM {table_name} LIMIT 3")
-    return cursor.fetchall()
+    # Execute the sqlite3 CLI command
+    result = subprocess.run(
+        ['sqlite3', db_filename, f'.schema {table_name}'],
+        capture_output=True,
+        text=True
+    )
 
-def generate_insert_statements(table_name, columns, rows):
-    inserts = []
-    for row in rows:
-        values = ', '.join(['?'] * len(row))
-        inserts.append(f"INSERT INTO {table_name}({', '.join(columns)}) VALUES ({values}); -- {row}")
-    return inserts
+    # Print the output
+    print(result.stdout)
 
-if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("Usage: script.py <database_filename> <table_name>")
-        sys.exit(1)
+@click.command()
+@click.argument('db_filename', type=click.Path(exists=True))
+@click.argument('table_name')
+def describe_and_sample(db_filename, table_name):
+    print(
+        f"""
+IMPORTANT - for this entire conversation
 
-    db_filename = sys.argv[1]
-    table_name = sys.argv[2]
+- I am going to ask you to write, respond as a helpful senior data scientist
+- You are talking to an expert programmer, do not explain basic concepts
+- Keep your responses short and dense
+- A description of the database schema you are working with is included below
+- You are working with a SQLite3 database
+
+# Table Schema for `{table_name}`
+```sql
+        """
+          )
+    describe_table_schema(db_filename, table_name)
 
     conn = sqlite3.connect(db_filename)
+    cursor = conn.cursor()
 
-    columns = describe_table(conn, table_name)
-    rows = sample_data(conn, table_name)
+    # Get table info
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = cursor.fetchall()
 
-    for statement in generate_insert_statements(table_name, columns, rows):
-        print(statement)
+    # Sample 3 rows
+    cursor.execute(f"SELECT * FROM {table_name} LIMIT 3")
+    sample_rows = cursor.fetchall()
+
+    print(
+f"""
+```
+
+3 sample rows from the `{table_name}` table:
+
+```sql
+"""
+          )
+
+    col_names = [col[1] for col in columns]
+    for row in sample_rows:
+        values = ', '.join(map(repr, row))  # Using repr() to handle data types like strings
+        print(f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});")
+
+    print("```")
 
     conn.close()
+
+if __name__ == '__main__':
+    describe_and_sample()
