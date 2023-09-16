@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "sqlite-ai-prompt"
+name = "generate-llm-sql-prompt"
 version = "0.1.0"
 description = ""
-authors = ["Michael Bianco <iloveitaly@gmail.com>"]
+authors = ["Michael Bianco <mike@mikebian.co>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
