@@ -2,6 +2,8 @@ import sqlite3
 import click
 import subprocess
 
+from util import system_prompt
+
 def describe_table_schema(db_filename, table_name):
     """Outputs the table schema using the sqlite3 CLI tool."""
 
@@ -21,12 +23,7 @@ def describe_table_schema(db_filename, table_name):
 def describe_and_sample(db_filename, table_name):
     print(
         f"""
-IMPORTANT - for this entire conversation
-
-- I am going to ask you to write, respond as a helpful senior data scientist
-- You are talking to an expert programmer, do not explain basic concepts
-- Keep your responses short and dense
-- A description of the database schema you are working with is included below
+{system_prompt()}
 - You are working with a SQLite3 database
 
 # Table Schema for `{table_name}`
@@ -43,7 +40,7 @@ IMPORTANT - for this entire conversation
     columns = cursor.fetchall()
 
     # Sample 3 rows
-    cursor.execute(f"SELECT * FROM {table_name} LIMIT 3")
+    cursor.execute(f"SELECT * FROM {table_name} LIMIT 3 ORDER BY RANDOM()")
     sample_rows = cursor.fetchall()
 
     print(
