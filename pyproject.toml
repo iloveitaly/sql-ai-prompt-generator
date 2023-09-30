@@ -5,10 +5,10 @@ description = "Utility to generate ChatGPT prompts for SQL writing, offering tab
 authors = ["Michael Bianco <mike@mikebian.co>"]
 readme = "README.md"
 keywords = [
-  "ChatGPT",
-  "SQL",
+  "chatgpt",
+  "sql",
   "prompt",
-  "LLMs",
+  "llms",
   "database",
   "postgres",
   "sqlite",
