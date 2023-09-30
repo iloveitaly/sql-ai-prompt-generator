@@ -1,9 +1,18 @@
 [tool.poetry]
 name = "generate-llm-sql-prompt"
 version = "0.1.0"
-description = ""
+description = "Utility to generate ChatGPT prompts for SQL writing, offering table structure snapshots and sample row data from Postgres and sqlite databases."
 authors = ["Michael Bianco <mike@mikebian.co>"]
 readme = "README.md"
+keywords = [
+  "ChatGPT",
+  "SQL",
+  "prompt",
+  "LLMs",
+  "database",
+  "postgres",
+  "sqlite",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
