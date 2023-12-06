@@ -20,6 +20,7 @@ Generate a prompt from a postgres database:
 
 ```shell
 python ./postgres.py postgresql://postgres:postgres@localhost:5555/database_name table_name | pbcopy
+python ./postgres.py $DATABASE_URL
 ```
 
 ## TODO
@@ -30,3 +31,4 @@ Super basic script, needs a lot of work
 - [ ] one entrypoint
 - [ ] multiple tables
 - [ ] prompt tweaking
+- [ ] understand prompt size limits and sample records until one fits

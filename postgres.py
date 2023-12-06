@@ -58,7 +58,7 @@ f"""
           )
 
     for row in sample_rows:
-        values = ', '.join(map(repr, row))  # Using repr() to handle data types like strings
+        values = ', '.join(map(repr, row))  # Usi`n`g repr() to handle data types like strings
         print(f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});")
 
     print("```")
