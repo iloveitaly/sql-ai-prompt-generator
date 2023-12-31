@@ -1,5 +1,5 @@
 def system_prompt():
-  return """
+    return """
   IMPORTANT - for this entire conversation
 
 - You are talking to an expert programmer, do not explain basic concepts

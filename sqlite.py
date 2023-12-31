@@ -8,6 +8,8 @@ from util import system_prompt
 def describe_table_schema(db_filename, table_name):
     """Outputs the table schema using the sqlite3 CLI tool."""
 
+    # TODO should use which to detect if this exists
+
     # Execute the sqlite3 CLI command
     result = subprocess.run(
         ["sqlite3", db_filename, f".schema {table_name}"],
@@ -49,7 +51,7 @@ def describe_and_sample(db_filename, table_name):
         f"""
 ```
 
-3 sample rows from the `{table_name}` table:
+## Sample rows from `{table_name}`:
 
 ```sql
 """
