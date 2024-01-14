@@ -1,8 +1,7 @@
 import sqlite3
-import click
 import subprocess
 
-from util import system_prompt
+from llm_sql_prompt.util import system_prompt
 
 
 def describe_table_schema(db_filename, table_name):
@@ -21,10 +20,31 @@ def describe_table_schema(db_filename, table_name):
     print(result.stdout)
 
 
-@click.command()
-@click.argument("db_filename", type=click.Path(exists=True))
-@click.argument("table_name")
-def describe_and_sample(db_filename, table_name):
+def list_sqllite_tables(db_filename):
+    """Outputs the table schema using the sqlite3 CLI tool."""
+
+    result = subprocess.run(
+        ["sqlite3", db_filename, ".tables"],
+        capture_output=True,
+        text=True,
+    )
+
+    # Split the output on whitespace and join with newlines
+    formatted_output = "\n".join(result.stdout.split())
+
+    return formatted_output
+
+
+def describe_database_and_table(db_filename, table_name):
+    if not table_name:
+        print(
+            f"""No table name provided. Please provide a table name from the list below:
+
+{list_sqllite_tables(db_filename)}
+            """
+        )
+        exit(1)
+
     print(
         f"""
 {system_prompt()}
@@ -67,7 +87,3 @@ def describe_and_sample(db_filename, table_name):
     print("```")
 
     conn.close()
-
-
-if __name__ == "__main__":
-    describe_and_sample()
