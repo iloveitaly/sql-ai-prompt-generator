@@ -17,7 +17,7 @@ keywords = [
 [tool.poetry.dependencies]
 python = "^3.11"
 click = "^8.1.7"
-psycopg2 = "^2.9.7"
+psycopg2 = "^2.9.9"
 
 
 [build-system]
