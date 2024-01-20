@@ -45,7 +45,7 @@ jobs:
 
       - name: Make sure it runs
         run: |
-          poetry run sqlite.py --help
+          poetry run llm-sql-prompt --help
 
       - name: Poetry Check
         run: |

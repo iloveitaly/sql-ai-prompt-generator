@@ -1,6 +1,6 @@
 # ChatGPT Prompt for SQL Writing
 
-Generate a prompt for writing SQL queries with LLMs like ChatGPT.
+Generate a prompt for writing SQL queries with LLMs like ChatGPT. Drop your database URL and table name into the script and it will generate a prompt for you to copy and paste into your favorite LLM.
 
 ## What this does
 
@@ -9,8 +9,8 @@ Generate a prompt for writing SQL queries with LLMs like ChatGPT.
 
 ## Usage
 
-```
-Usage: script.py [OPTIONS] DB_FILENAME TABLE_NAME
+```shell
+Usage: llm-sql-prompt [OPTIONS] DATABASE_URL [TABLE_NAME]
 
 Options:
   --help  Show this message and exit.
@@ -19,8 +19,8 @@ Options:
 Generate a prompt from a postgres database:
 
 ```shell
-python ./postgres.py postgresql://postgres:postgres@localhost:5555/database_name table_name | pbcopy
-python ./postgres.py $DATABASE_URL
+llm-sql-prompt postgresql://postgres:postgres@localhost:5555/database_name table_name | pbcopy
+llm-sql-prompt $DATABASE_URL
 ```
 
 ## TODO
@@ -28,7 +28,7 @@ python ./postgres.py $DATABASE_URL
 Super basic script, needs a lot of work
 
 - [x] pg support
-- [ ] one entrypoint
+- [x] one entrypoint
 - [ ] multiple tables
 - [ ] prompt tweaking
 - [ ] understand prompt size limits and sample records until one fits
