@@ -9,6 +9,14 @@ Generate a prompt for writing SQL queries with LLMs like ChatGPT. Drop your data
 
 ## Usage
 
+Install the package:
+
+```shell
+pip install llm-sql-prompt
+```
+
+Here's how to use it:
+
 ```shell
 Usage: llm-sql-prompt [OPTIONS] DATABASE_URL [TABLE_NAME]
 
