@@ -48,7 +48,9 @@ def describe_database_and_table(db_filename, table_name):
     print(
         f"""
 {system_prompt()}
-- You are working with a SQLite3 database
+- You are working with a SQLite 3 database
+- SQLite does not support the CREATE OR REPLACE syntax
+- Quote reserved words like 'to'
 
 # Table Schema for `{table_name}`
 ```sql
