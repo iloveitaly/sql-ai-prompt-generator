@@ -1,4 +1,13 @@
-# 0.2.0 (2024-01-20)
+# [0.3.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.2.0...v0.3.0) (2024-01-31)
+
+
+### Features
+
+* better documentation around url structure, allow non-file database paths ([457cd6f](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/457cd6f43645e94d4f2f49cbe34aea8fb3aef0bd))
+
+
+
+# [0.2.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/b7e45f12d83b996e4d31813b9190a329e2d6e929...v0.2.0) (2024-01-20)
 
 
 ### Bug Fixes
