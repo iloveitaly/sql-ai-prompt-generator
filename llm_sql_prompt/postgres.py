@@ -1,3 +1,4 @@
+import textwrap
 import psycopg2
 
 from llm_sql_prompt.util import system_prompt
@@ -23,7 +24,39 @@ def describe_table_schema(conn, table_name):
             print(f"{col_name} {data_type}")
 
 
+def print_table_name_options(db_url):
+    conn = psycopg2.connect(db_url)
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+    """
+    )
+
+    table_list = cur.fetchall()
+    # returns a list of tuples
+    table_list = [table[0] for table in table_list]
+    formatted_table_list = "\n- ".join(table_list)
+    conn.close()
+
+    # Print the table names
+    print(
+        f"""
+No table name provided. Please provide a table name from the list below:
+
+- {formatted_table_list}
+        """
+    )
+
+
 def describe_database_and_table(db_url, table_name):
+    if not table_name:
+        print_table_name_options(db_url)
+        exit(1)
+
     print(
         f"""
 {system_prompt()}

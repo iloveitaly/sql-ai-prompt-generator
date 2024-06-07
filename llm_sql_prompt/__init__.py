@@ -1,4 +1,3 @@
-from pkg_resources import require
 import click
 from . import sqlite
 from . import postgres
