@@ -1,3 +1,12 @@
+# [0.5.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.4.0...v0.5.0) (2024-06-07)
+
+
+### Features
+
+* support multiple tables ([ecdf388](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/ecdf3884e881bc9e3a5b4b87da6c7cfd7df7e7c9))
+
+
+
 # [0.4.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.3.0...v0.4.0) (2024-06-07)
 
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "llm-sql-prompt"
-version = "0.4.0"
+version = "0.5.0"
 description = "Utility to generate ChatGPT prompts for SQL writing, offering table structure snapshots and sample row data from Postgres and sqlite databases."
 authors = ["Michael Bianco <mike@mikebian.co>"]
 readme = "README.md"
