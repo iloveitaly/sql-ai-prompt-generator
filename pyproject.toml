@@ -4,6 +4,7 @@ version = "0.3.0"
 description = "Utility to generate ChatGPT prompts for SQL writing, offering table structure snapshots and sample row data from Postgres and sqlite databases."
 authors = ["Michael Bianco <mike@mikebian.co>"]
 readme = "README.md"
+homepage = "https://pypi.org/project/llm-sql-prompt/"
 keywords = [
   "chatgpt",
   "sql",
@@ -16,8 +17,8 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-click = "^8.1.7"
-psycopg2 = "^2.9.9"
+click = "^8.1"
+psycopg2 = "^2.9"
 
 [tool.poetry.scripts]
 llm-sql-prompt = "llm_sql_prompt:main"
