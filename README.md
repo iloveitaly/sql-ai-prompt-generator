@@ -85,6 +85,6 @@ Super basic script, needs a lot of work
 - [x] pg support
 - [x] one entrypoint
 - [ ] use DB comments on columns + tables
-- [ ] multiple tables
+- [x] multiple tables
 - [ ] prompt tweaking
 - [ ] understand prompt size limits and sample records until one fits
