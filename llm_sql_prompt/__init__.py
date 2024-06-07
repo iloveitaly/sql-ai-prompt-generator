@@ -7,11 +7,8 @@ from . import postgres
 @click.argument(
     "database_url",
 )
-@click.argument(
-    "table_name",
-    required=False,
-)
-def main(database_url, table_name):
+@click.argument("table_names", required=False, nargs=-1)
+def main(database_url, table_names: tuple[str]):
     """
     Generate a prompt for a table in a database for use in chatgpt or other LLMs to help write SQL.
 
@@ -21,9 +18,9 @@ def main(database_url, table_name):
     """
 
     if "postgresql" in database_url:
-        postgres.describe_database_and_table(database_url, table_name)
+        postgres.describe_database_and_table(database_url, table_names)
     elif "sqlite" in database_url:
-        sqlite.describe_database_and_table(database_url, table_name)
+        sqlite.describe_database_and_table(database_url, table_names)
     else:
         print("Unknown database type.")
         exit(1)

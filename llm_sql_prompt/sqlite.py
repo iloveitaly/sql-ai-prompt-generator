@@ -35,8 +35,8 @@ def list_sqllite_tables(db_filename):
     return formatted_output
 
 
-def describe_database_and_table(db_filename, table_name):
-    if not table_name:
+def describe_database_and_table(db_filename, table_names):
+    if not table_names:
         print(
             f"""No table name provided. Please provide a table name from the list below:
 
@@ -52,40 +52,49 @@ def describe_database_and_table(db_filename, table_name):
 - SQLite does not support the CREATE OR REPLACE syntax
 - Quote reserved words like 'to'
 
-# Table Schema for `{table_name}`
-```sql
         """
     )
-    describe_table_schema(db_filename, table_name)
 
-    conn = sqlite3.connect(db_filename)
-    cursor = conn.cursor()
-
-    # Get table info
-    cursor.execute(f"PRAGMA table_info({table_name})")
-    columns = cursor.fetchall()
-
-    # Sample 3 rows
-    cursor.execute(f"SELECT * FROM {table_name} ORDER BY RANDOM() LIMIT 3")
-    sample_rows = cursor.fetchall()
-
-    print(
-        f"""
-```
-
-## Sample rows from `{table_name}`:
-
+    for table_name in table_names:
+        print(
+            """
+# Table Schema for `{table_name}`
 ```sql
 """
-    )
+        )
 
-    col_names = [col[1] for col in columns]
-    for row in sample_rows:
-        values = ", ".join(
-            map(repr, row)
-        )  # Using repr() to handle data types like strings
-        print(f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});")
+        describe_table_schema(db_filename, table_name)
 
-    print("```")
+        conn = sqlite3.connect(db_filename)
+        cursor = conn.cursor()
 
-    conn.close()
+        # Get table info
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns = cursor.fetchall()
+
+        # Sample 3 rows
+        cursor.execute(f"SELECT * FROM {table_name} ORDER BY RANDOM() LIMIT 3")
+        sample_rows = cursor.fetchall()
+
+        print(
+            f"""
+    ```
+
+    ## Sample rows from `{table_name}`:
+
+    ```sql
+    """
+        )
+
+        col_names = [col[1] for col in columns]
+        for row in sample_rows:
+            values = ", ".join(
+                map(repr, row)
+            )  # Using repr() to handle data types like strings
+            print(
+                f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});"
+            )
+
+        print("```")
+
+        conn.close()
