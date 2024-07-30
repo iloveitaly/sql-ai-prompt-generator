@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.5.0...v0.5.1) (2024-07-30)
+
+
+### Bug Fixes
+
+* adding --all to dump prompt for all tables, allow file sqlite file paths ([0d2f818](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/0d2f818894ff6c56428ab639ebaf279890112da1))
+
+
+
 # [0.5.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.4.0...v0.5.0) (2024-06-07)
 
 
