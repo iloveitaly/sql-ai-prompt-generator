@@ -1,3 +1,4 @@
+from pathlib import Path
 import click
 from . import sqlite
 from . import postgres
@@ -8,7 +9,13 @@ from . import postgres
     "database_url",
 )
 @click.argument("table_names", required=False, nargs=-1)
-def main(database_url, table_names: tuple[str]):
+@click.option(
+    "--all",
+    is_flag=True,
+    default=False,
+    help="Generate a prompt for all tables in the database.",
+)
+def main(database_url, table_names: tuple[str], all: bool):
     """
     Generate a prompt for a table in a database for use in chatgpt or other LLMs to help write SQL.
 
@@ -18,9 +25,9 @@ def main(database_url, table_names: tuple[str]):
     """
 
     if "postgresql" in database_url:
-        postgres.describe_database_and_table(database_url, table_names)
-    elif "sqlite" in database_url:
-        sqlite.describe_database_and_table(database_url, table_names)
+        postgres.describe_database_and_table(database_url, table_names, all)
+    elif "sqlite" in database_url or Path(database_url).exists():
+        sqlite.describe_database_and_table(database_url, table_names, all)
     else:
         print("Unknown database type.")
         exit(1)

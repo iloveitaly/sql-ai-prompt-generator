@@ -35,8 +35,8 @@ def list_sqllite_tables(db_filename):
     return formatted_output
 
 
-def describe_database_and_table(db_filename, table_names):
-    if not table_names:
+def describe_database_and_table(db_filename, table_names, all_tables):
+    if not table_names and not all_tables:
         print(
             f"""No table name provided. Please provide a table name from the list below:
 
@@ -44,6 +44,9 @@ def describe_database_and_table(db_filename, table_names):
             """
         )
         exit(1)
+
+    if all_tables:
+        table_names = list_sqllite_tables(db_filename).split()
 
     print(
         f"""
@@ -80,9 +83,9 @@ def describe_database_and_table(db_filename, table_names):
             f"""
     ```
 
-    ## Sample rows from `{table_name}`:
+## Sample rows from `{table_name}`:
 
-    ```sql
+```sql
     """
         )
 

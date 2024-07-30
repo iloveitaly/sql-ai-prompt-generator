@@ -24,23 +24,28 @@ def describe_table_schema(conn, table_name):
             print(f"{col_name} {data_type}")
 
 
-def print_table_name_options(db_url):
+def get_table_names(db_url) -> list[str]:
+    """Get the table names from the database."""
     conn = psycopg2.connect(db_url)
-    cur = conn.cursor()
 
-    cur.execute(
-        """
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
-    """
-    )
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            """
+        )
 
-    table_list = cur.fetchall()
-    # returns a list of tuples
-    table_list = [table[0] for table in table_list]
+        table_list = cursor.fetchall()
+        table_list = [table[0] for table in table_list]
+
+    return table_list
+
+
+def print_table_name_options(db_url):
+    table_list = get_table_names(db_url)
     formatted_table_list = "\n- ".join(table_list)
-    conn.close()
 
     # Print the table names
     print(
@@ -52,8 +57,8 @@ No table name provided. Please provide a table name from the list below:
     )
 
 
-def describe_database_and_table(db_url, table_names):
-    if not table_names:
+def describe_database_and_table(db_url: str, table_names: list[str], all_tables: bool):
+    if not table_names and not all_tables:
         print_table_name_options(db_url)
         exit(1)
 
@@ -64,6 +69,9 @@ def describe_database_and_table(db_url, table_names):
 
         """
     )
+
+    if all_tables:
+        table_names = get_table_names(db_url)
 
     with psycopg2.connect(db_url) as conn:
         for table_name in table_names:
