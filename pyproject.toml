@@ -17,8 +17,8 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-click = "^8.1"
-psycopg2 = "^2.9"
+click = "^8.1.7"
+psycopg2 = "^2.9.9"
 
 [tool.poetry.scripts]
 llm-sql-prompt = "llm_sql_prompt:main"
@@ -27,8 +27,8 @@ llm-sql-prompt = "llm_sql_prompt:main"
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
 black = "^24.4.2"
-pyright = "^1.1.366"
-pylint = "^3.2.3"
+pyright = "^1.1.373"
+pylint = "^3.2.6"
 
 [tool.isort]
 profile = "black"
