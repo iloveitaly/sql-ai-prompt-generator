@@ -25,7 +25,7 @@ llm-sql-prompt = "llm_sql_prompt:main"
 
 
 [tool.poetry.group.dev.dependencies]
-isort = "^5.13.2"
+isort = ">=5.13.2,<7.0.0"
 black = "^24.4.2"
 pyright = "^1.1.373"
 pylint = "^3.2.6"
