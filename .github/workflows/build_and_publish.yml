@@ -35,12 +35,6 @@ jobs:
           fallback-version: "0.1.0"
           output-file: "CHANGELOG.md"
 
-      # NOTE must run after versioning otherwise the right version won't be pushed
-      - name: Build distribution package
-        if: ${{ steps.changelog.outputs.skipped == 'false' }}
-        run: |
-          poetry build
-
       - name: Publish to PyPI
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
         run: |
