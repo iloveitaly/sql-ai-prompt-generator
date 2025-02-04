@@ -26,8 +26,8 @@ def main(database_url, table_names: tuple[str], all: bool):
 
     if "postgresql" in database_url:
         postgres.describe_database_and_table(database_url, table_names, all)
-    elif "sqlite" in database_url or Path(database_url).exists():
+    elif ("sqlite" in database_url) or Path(database_url).exists():
         sqlite.describe_database_and_table(database_url, table_names, all)
     else:
-        print("Unknown database type.")
+        print("Unknown database type. If you are referencing a SQLite database, make sure you've specified a valid file path")
         exit(1)

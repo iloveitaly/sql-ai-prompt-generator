@@ -50,7 +50,7 @@ def print_table_name_options(db_url):
     # Print the table names
     print(
         f"""
-No table name provided. Please provide a table name from the list below:
+No table name provided. Please provide a table name from the list below, or use --all:
 
 - {formatted_table_list}
         """
