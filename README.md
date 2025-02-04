@@ -31,6 +31,12 @@ llm-sql-prompt postgresql://postgres:postgres@localhost:5555/database_name table
 llm-sql-prompt $DATABASE_URL
 ```
 
+From a local sqlite database:
+
+```shell
+llm-sql-prompt "$HOME/Library/Application Support/BeeperTexts/index.db" --all
+```
+
 ### Tunneling to a remote port
 
 If you find yourself wanting to tunnel into a remote box and work with a production database, here's some helpful commands so you don't need to remember the weird SSH tunneling syntax:
