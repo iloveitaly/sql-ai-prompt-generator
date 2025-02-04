@@ -1,40 +1,43 @@
-[tool.poetry]
+[project]
 name = "llm-sql-prompt"
 version = "0.5.1"
 description = "Utility to generate ChatGPT prompts for SQL writing, offering table structure snapshots and sample row data from Postgres and sqlite databases."
-authors = ["Michael Bianco <mike@mikebian.co>"]
+authors = [{ name = "Michael Bianco", email = "mike@mikebian.co" }]
+requires-python = "~=3.11"
 readme = "README.md"
-homepage = "https://pypi.org/project/llm-sql-prompt/"
 keywords = [
-  "chatgpt",
-  "sql",
-  "prompt",
-  "llms",
-  "database",
-  "postgres",
-  "sqlite",
+    "chatgpt",
+    "sql",
+    "prompt",
+    "llms",
+    "database",
+    "postgres",
+    "sqlite",
+]
+dependencies = [
+    "click>=8.1.7,<9",
+    "psycopg2>=2.9.9,<3",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-click = "^8.1.7"
-psycopg2 = "^2.9.9"
+[project.urls]
+Homepage = "https://pypi.org/project/llm-sql-prompt/"
 
-[tool.poetry.scripts]
+[project.scripts]
 llm-sql-prompt = "llm_sql_prompt:main"
 
+[dependency-groups]
+dev = [
+    "isort>=5.13.2,<6",
+    "black>=24.4.2,<25",
+    "pyright>=1.1.373,<2",
+    "pylint>=3.2.6,<4",
+]
 
-[tool.poetry.group.dev.dependencies]
-isort = ">=5.13.2,<7.0.0"
-black = ">=24.4.2,<26.0.0"
-pyright = "^1.1.373"
-pylint = "^3.2.6"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.isort]
 profile = "black"
 # helpful when copy/pasting GPT code
 float_to_top = true
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
