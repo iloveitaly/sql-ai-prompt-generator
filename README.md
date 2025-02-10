@@ -6,6 +6,7 @@ Generate a prompt for writing SQL queries with LLMs like ChatGPT. Drop your data
 
 - Snapshot of Table Structure: Understand the columns, types, and organization of your table at a glance.
 - Sample Rows: Includes INSERT statements to describe the data in your table.
+- Extracts Table and Field Comments: If you have comments on your tables or columns, they will be included in the prompt.
 
 ## Usage
 
@@ -90,7 +91,7 @@ Super basic script, needs a lot of work
 
 - [x] pg support
 - [x] one entrypoint
-- [ ] use DB comments on columns + tables
+- [x] use DB comments on columns + tables
 - [x] multiple tables
 - [ ] prompt tweaking
 - [ ] understand prompt size limits and sample records until one fits
