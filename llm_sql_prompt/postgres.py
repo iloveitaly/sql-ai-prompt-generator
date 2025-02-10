@@ -5,16 +5,18 @@ from llm_sql_prompt.util import system_prompt
 
 
 def describe_table_schema(conn, table_name):
-    """Outputs the table schema using SQL, including column comments if available."""
+    """Outputs the table schema using SQL, including column comments and FK info if available."""
     query = f"""
     SELECT column_name, data_type, character_maximum_length
     FROM INFORMATION_SCHEMA.COLUMNS
     WHERE table_name = '{table_name}';
     """
-
     with conn.cursor() as cursor:
         cursor.execute(query)
         schema = cursor.fetchall()
+
+    # Retrieve foreign key mapping: { column_name: (foreign_table, foreign_column) }
+    foreign_keys = get_foreign_keys(conn, table_name)
 
     for column in schema:
         col_name, data_type, max_length = column
@@ -23,6 +25,11 @@ def describe_table_schema(conn, table_name):
             line = f"{col_name} {data_type}({max_length})"
         else:
             line = f"{col_name} {data_type}"
+        
+        # Append FK info if exists
+        if col_name in foreign_keys:
+            fk_table, fk_column = foreign_keys[col_name]
+            line += f" REFERENCES {fk_table}({fk_column})"
         
         # Get column comment if it exists
         col_comment = get_column_comments(conn, table_name, col_name)
@@ -161,3 +168,26 @@ def get_column_comments(conn, table_name, column_name: str = None):
             return result[1] if result and result[1] else ""
         else:
             return {row[0]: row[1] for row in cursor.fetchall()}
+
+def get_foreign_keys(conn, table_name):
+    """
+    Returns a dictionary mapping column names to a tuple (foreign_table, foreign_column)
+    for foreign key constraints of the given table.
+    """
+    query = """
+    SELECT
+      kcu.column_name,
+      ccu.table_name AS foreign_table_name,
+      ccu.column_name AS foreign_column_name
+    FROM information_schema.table_constraints AS tc
+    JOIN information_schema.key_column_usage AS kcu
+      ON tc.constraint_name = kcu.constraint_name
+    JOIN information_schema.constraint_column_usage AS ccu
+      ON ccu.constraint_name = tc.constraint_name
+    WHERE tc.constraint_type = 'FOREIGN KEY'
+      AND tc.table_name = %s;
+    """
+    with conn.cursor() as cursor:
+        cursor.execute(query, (table_name,))
+        results = cursor.fetchall()
+    return {row[0]: (row[1], row[2]) for row in results}
