@@ -5,7 +5,7 @@ from llm_sql_prompt.util import system_prompt
 
 
 def describe_table_schema(conn, table_name):
-    """Outputs the table schema using SQL."""
+    """Outputs the table schema using SQL, including column comments if available."""
     query = f"""
     SELECT column_name, data_type, character_maximum_length
     FROM INFORMATION_SCHEMA.COLUMNS
@@ -18,10 +18,18 @@ def describe_table_schema(conn, table_name):
 
     for column in schema:
         col_name, data_type, max_length = column
+
         if max_length:
-            print(f"{col_name} {data_type}({max_length})")
+            line = f"{col_name} {data_type}({max_length})"
         else:
-            print(f"{col_name} {data_type}")
+            line = f"{col_name} {data_type}"
+        
+        # Get column comment if it exists
+        col_comment = get_column_comments(conn, table_name, col_name)
+        if col_comment:
+            line += f" -- {col_comment}"
+            
+        print(line)
 
 
 def get_table_names(db_url) -> list[str]:
@@ -66,23 +74,25 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
         f"""
 {system_prompt()}
 - You are working with a PostgreSQL database
-
         """
     )
-
+    
     if all_tables:
         table_names = get_table_names(db_url)
 
     with psycopg2.connect(db_url) as conn:
         for table_name in table_names:
+            # Retrieve table_comment using the valid connection "conn"
+            table_comment = get_table_comment(conn, table_name)
             print(
                 f"""
 # Table Schema for `{table_name}`
-```sql
-"""
+{table_comment}
+```sql"""
             )
 
             describe_table_schema(conn, table_name)
+            print("```")  # Close table schema SQL block
 
             with conn.cursor() as cursor:
                 # Sample 3 rows
@@ -95,22 +105,59 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
                 )
                 col_names = [col[0] for col in cursor.fetchall()]
 
-                print(
-                    f"""
+                if sample_rows:
+                    print(
+                        f"""
 ```
 
 3 sample rows from the `{table_name}` table:
 
 ```sql
-            """
-                )
-
-                for row in sample_rows:
-                    values = ", ".join(
-                        map(repr, row)
-                    )  # Usi`n`g repr() to handle data types like strings
-                    print(
-                        f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});"
+                        """
                     )
+                    for row in sample_rows:
+                        values = ", ".join(map(repr, row))  # Using repr() to handle various data types
+                        print(
+                            f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});"
+                        )
+                    print("```")
 
-                print("```")
+def get_table_comment(conn, table_name):
+    query = """
+    SELECT pd.description
+    FROM pg_description pd
+    JOIN pg_class pc ON pd.objoid = pc.oid
+    WHERE pc.relname = %s AND pd.objsubid = 0
+    """
+    with conn.cursor() as cursor:
+        cursor.execute(query, (table_name,))
+        result = cursor.fetchone()
+
+        if result:
+            return result[0]
+        
+        return ""
+
+def get_column_comments(conn, table_name, column_name: str = None):
+    """
+    When column_name is provided, returns the comment for that column.
+    Otherwise, returns a dictionary mapping column names to comments.
+    """
+    query = """
+    SELECT a.attname as column_name, pd.description
+    FROM pg_description pd
+    JOIN pg_class pc ON pd.objoid = pc.oid
+    JOIN pg_attribute a ON pd.objsubid = a.attnum AND a.attrelid = pc.oid
+    WHERE pc.relname = %s AND pd.objsubid > 0
+    """
+    params = [table_name]
+    if column_name:
+        query += " AND a.attname = %s"
+        params.append(column_name)
+    with conn.cursor() as cursor:
+        cursor.execute(query, tuple(params))
+        if column_name:
+            result = cursor.fetchone()
+            return result[1] if result and result[1] else ""
+        else:
+            return {row[0]: row[1] for row in cursor.fetchall()}
