@@ -1,3 +1,13 @@
+# [0.6.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.5.2...v0.6.0) (2025-02-10)
+
+
+### Features
+
+* enhance schema description with foreign key info ([e35891b](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/e35891b0063e4f8da41e76321fe69997fd78f8a0))
+* include table and column comments in schema output ([5052f09](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/5052f09cee567ab34112ff3fb135089eeeba2505))
+
+
+
 ## [0.5.2](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.5.1...v0.5.2) (2025-02-04)
 
 
@@ -36,15 +46,6 @@
 ### Features
 
 * print table options when describing postgres ([ab56e19](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/ab56e193e0aac50b087da6232e866fbc74c61aec))
-
-
-
-# [0.3.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.2.0...v0.3.0) (2024-01-31)
-
-
-### Features
-
-* better documentation around url structure, allow non-file database paths ([457cd6f](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/457cd6f43645e94d4f2f49cbe34aea8fb3aef0bd))
 
 
 

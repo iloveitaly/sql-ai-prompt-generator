@@ -1,6 +1,6 @@
 [project]
 name = "llm-sql-prompt"
-version = "0.5.2"
+version = "0.6.0"
 description = "Utility to generate ChatGPT prompts for SQL writing, offering table structure snapshots and sample row data from Postgres and sqlite databases."
 authors = [{ name = "Michael Bianco", email = "mike@mikebian.co" }]
 requires-python = "~=3.11"
