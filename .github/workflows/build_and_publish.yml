@@ -16,11 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2
-      - name: Sync Repository Metadata
-        uses: iloveitaly/github-actions-metadata-sync@main
-        with:
-          TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
-
       - run: uv sync
       - name: Make sure it runs
         run: uv run llm-sql-prompt --help
