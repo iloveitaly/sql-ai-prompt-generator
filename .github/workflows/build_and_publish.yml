@@ -33,6 +33,8 @@ jobs:
       - name: Publish to PyPI
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
         run: |
+          uv build
+
           # `gh secret set PYPI_API_TOKEN --app actions --body $PYPI_API_TOKEN`
           uv publish --token ${{ secrets.PYPI_API_TOKEN }}
 
