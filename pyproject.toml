@@ -16,6 +16,7 @@ keywords = [
 ]
 dependencies = [
     "click>=8.1.7,<9",
+    "mysql-connector-python>=9.2.0",
     "psycopg2>=2.9.9,<3",
 ]
 
