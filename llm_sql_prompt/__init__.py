@@ -16,7 +16,13 @@ from . import mysql
     default=False,
     help="Generate a prompt for all tables in the database.",
 )
-def main(database_url, table_names: tuple[str], all: bool):
+@click.option(
+    "--no-data",
+    is_flag=True,
+    default=False,
+    help="Exclude sample data from the generated prompt.",
+)
+def main(database_url, table_names: tuple[str], all: bool, no_data: bool):
     """
     Generate a prompt for a table in a database for use in chatgpt or other LLMs to help write SQL.
 
@@ -24,13 +30,15 @@ def main(database_url, table_names: tuple[str], all: bool):
 
     - TABLE_NAME Name of the table to generate a prompt for. If not provided, will generate a prompt for all tables in the database.
     """
+    # Convert the no_data flag to include_data parameter (inverse logic)
+    include_data = not no_data
 
     if "postgresql" in database_url:
-        postgres.describe_database_and_table(database_url, table_names, all)
+        postgres.describe_database_and_table(database_url, table_names, all, include_data)
     elif "mysql" in database_url:
-        mysql.describe_database_and_table(database_url, table_names, all)
+        mysql.describe_database_and_table(database_url, table_names, all, include_data)
     elif ("sqlite" in database_url) or Path(database_url).exists():
-        sqlite.describe_database_and_table(database_url, table_names, all)
+        sqlite.describe_database_and_table(database_url, table_names, all, include_data)
     else:
         print("Unknown database type. If you are referencing a SQLite database, make sure you've specified a valid file path")
         exit(1)

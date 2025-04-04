@@ -164,7 +164,7 @@ def get_foreign_keys(conn, table_name):
 
     return {row[0]: (row[1], row[2]) for row in results}
 
-def describe_database_and_table(db_url: str, table_names: list[str], all_tables: bool):
+def describe_database_and_table(db_url: str, table_names: list[str], all_tables: bool, include_data: bool = True):
     """Main function to describe database tables."""
 
     if not table_names and not all_tables:
@@ -196,33 +196,34 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
             describe_table_schema(conn, table_name)
             print("```")  # Close table schema SQL block
 
-            with conn.cursor() as cursor:
-                # Sample 3 rows
-                cursor.execute(f"SELECT * FROM {table_name} ORDER BY RAND() LIMIT 3")
-                sample_rows = cursor.fetchall()
+            if include_data:
+                with conn.cursor() as cursor:
+                    # Sample 3 rows
+                    cursor.execute(f"SELECT * FROM {table_name} ORDER BY RAND() LIMIT 3")
+                    sample_rows = cursor.fetchall()
 
-                # Get column names
-                cursor.execute(
-                    f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = %s;",
-                    (table_name, conn.database)
-                )
-                col_names = [col[0] for col in cursor.fetchall()]
+                    # Get column names
+                    cursor.execute(
+                        f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = %s;",
+                        (table_name, conn.database)
+                    )
+                    col_names = [col[0] for col in cursor.fetchall()]
 
-                if sample_rows:
-                    print(
-                        f"""
+                    if sample_rows:
+                        print(
+                            f"""
 ```
 
 3 sample rows from the `{table_name}` table:
 
 ```sql
-                        """
-                    )
-                    for row in sample_rows:
-                        values = ", ".join(map(repr, row))
-                        print(
-                            f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});"
+                            """
                         )
-                    print("```")
+                        for row in sample_rows:
+                            values = ", ".join(map(repr, row))
+                            print(
+                                f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({values});"
+                            )
+                        print("```")
     finally:
         conn.close()
