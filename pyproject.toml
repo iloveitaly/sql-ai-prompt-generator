@@ -28,7 +28,7 @@ llm-sql-prompt = "llm_sql_prompt:main"
 
 [dependency-groups]
 dev = [
-    "isort>=5.13.2,<6",
+    "isort>=5.13.2,<7",
     "black>=24.4.2,<26",
     "pyright>=1.1.373,<2",
     "pylint>=3.2.6,<4",
