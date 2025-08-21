@@ -17,7 +17,8 @@ keywords = [
 dependencies = [
     "click>=8.1.7,<9",
     "mysql-connector-python>=9.2.0",
-    "psycopg[binary]",
+    # Psycopg 3 (module name psycopg)
+    "psycopg[binary]>=3.1",
 ]
 
 [project.urls]
