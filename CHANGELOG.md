@@ -1,3 +1,12 @@
+# [0.9.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.8.0...v0.9.0) (2025-08-21)
+
+
+### Features
+
+* enhanced schema description to include installed PostgreSQL extensions and server version. ([ad86e31](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/ad86e314316249c33ce92e7b4ca1cbbe0f0578f7))
+
+
+
 # [0.8.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.7.0...v0.8.0) (2025-04-04)
 
 
@@ -32,15 +41,6 @@
 ### Bug Fixes
 
 * improve database type error messages for clarity ([e604054](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/e604054054cb5ca3f10e0db816663a2d54eb39b1))
-
-
-
-## [0.5.1](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.5.0...v0.5.1) (2024-07-30)
-
-
-### Bug Fixes
-
-* adding --all to dump prompt for all tables, allow file sqlite file paths ([0d2f818](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/0d2f818894ff6c56428ab639ebaf279890112da1))
 
 
 

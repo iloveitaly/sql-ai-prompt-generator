@@ -108,8 +108,8 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "black", specifier = ">=24.4.2,<25" },
-    { name = "isort", specifier = ">=5.13.2,<6" },
+    { name = "black", specifier = ">=24.4.2,<26" },
+    { name = "isort", specifier = ">=5.13.2,<7" },
     { name = "pylint", specifier = ">=3.2.6,<4" },
     { name = "pyright", specifier = ">=1.1.373,<2" },
 ]
