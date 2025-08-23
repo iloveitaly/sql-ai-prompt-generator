@@ -48,6 +48,8 @@ def get_table_names(db_url) -> list[str]:
                 SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema = 'public'
+                AND table_name NOT LIKE 'pg_stat_%'
+                AND table_name NOT LIKE 'pg_%'
                 ORDER BY table_name
                 """
             )
