@@ -1,12 +1,21 @@
+import logging
+import os
+
 import psycopg
 from psycopg import sql
 
 from llm_sql_prompt.util import system_prompt
 
+logging.basicConfig(
+    level=os.environ.get("LOG_LEVEL", "INFO").upper(),
+)
+
+logger = logging.getLogger(__name__)
+
 
 def should_skip_table(table_name: str) -> bool:
     """Check if a table should be skipped due to being a PostgreSQL system table."""
-    return table_name.startswith('pg_stat_') or table_name.startswith('pg_')
+    return table_name.startswith("pg_stat_") or table_name.startswith("pg_")
 
 
 def describe_table_schema(conn, table_name):
@@ -30,17 +39,17 @@ def describe_table_schema(conn, table_name):
             line = f"{col_name} {data_type}({max_length})"
         else:
             line = f"{col_name} {data_type}"
-        
+
         # Append FK info if exists
         if col_name in foreign_keys:
             fk_table, fk_column = foreign_keys[col_name]
             line += f" REFERENCES {fk_table}({fk_column})"
-        
+
         # Get column comment if it exists
         col_comment = get_column_comments(conn, table_name, col_name)
         if col_comment:
             line += f" -- {col_comment}"
-            
+
         print(line)
 
 
@@ -89,7 +98,9 @@ def get_installed_extensions(conn):
         return cursor.fetchall()  # list of (name, version, comment)
 
 
-def describe_database_and_table(db_url: str, table_names: list[str], all_tables: bool, include_data: bool = True):
+def describe_database_and_table(
+    db_url: str, table_names: list[str], all_tables: bool, include_data: bool = True
+):
     """Main function to describe database tables, including installed extensions."""
 
     if not table_names and not all_tables:
@@ -125,7 +136,8 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
                     pass
         if extensions:
             extensions_formatted = "\n".join(
-                f"  - {name} ({version}){f': {comment}' if comment else ''}" for name, version, comment in extensions
+                f"  - {name} ({version}){f': {comment}' if comment else ''}"
+                for name, version, comment in extensions
             )
             extensions_block = f"- Installed PostgreSQL extensions in this database:\n{extensions_formatted}"
         else:
@@ -142,9 +154,9 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
         for table_name in table_names:
             # Skip PostgreSQL system tables that might cause access issues
             if should_skip_table(table_name):
-                print(f"# Skipping table `{table_name}` (PostgreSQL system table)")
+                logger.info(f"Skipping table `{table_name}` (PostgreSQL system table)")
                 continue
-                
+
             table_comment = get_table_comment(conn, table_name)
             print(
                 f"""
@@ -159,15 +171,15 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
             if include_data:
                 with conn.cursor() as cursor:
                     # Retrieve sample rows (identifier safely inserted)
-                    sample_query = sql.SQL("SELECT * FROM {} ORDER BY RANDOM() LIMIT 3").format(
-                        sql.Identifier(table_name)
-                    )
+                    sample_query = sql.SQL(
+                        "SELECT * FROM {} ORDER BY RANDOM() LIMIT 3"
+                    ).format(sql.Identifier(table_name))
                     cursor.execute(sample_query)
                     sample_rows = cursor.fetchall()
 
                     cursor.execute(
                         "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = %s;",
-                        (table_name,)
+                        (table_name,),
                     )
                     col_names = [col[0] for col in cursor.fetchall()]
 
@@ -188,6 +200,7 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
                             )
                         print("```")
 
+
 def get_table_comment(conn, table_name):
     query = """
     SELECT pd.description
@@ -201,8 +214,9 @@ def get_table_comment(conn, table_name):
 
         if result:
             return result[0]
-        
+
         return ""
+
 
 def get_column_comments(conn, table_name, column_name: str | None = None):
     """
@@ -227,6 +241,7 @@ def get_column_comments(conn, table_name, column_name: str | None = None):
             return result[1] if result and result[1] else ""
         else:
             return {row[0]: row[1] for row in cursor.fetchall()}
+
 
 def get_foreign_keys(conn, table_name):
     """
