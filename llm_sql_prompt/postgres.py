@@ -4,6 +4,11 @@ from psycopg import sql
 from llm_sql_prompt.util import system_prompt
 
 
+def should_skip_table(table_name: str) -> bool:
+    """Check if a table should be skipped due to being a PostgreSQL system table."""
+    return table_name.startswith('pg_stat_') or table_name.startswith('pg_')
+
+
 def describe_table_schema(conn, table_name):
     """Outputs the table schema using SQL, including column comments and FK info if available."""
     query = """
@@ -48,12 +53,12 @@ def get_table_names(db_url) -> list[str]:
                 SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema = 'public'
-                AND table_name NOT LIKE 'pg_stat_%'
-                AND table_name NOT LIKE 'pg_%'
                 ORDER BY table_name
                 """
             )
-            table_list = [row[0] for row in cursor.fetchall()]
+            all_tables = [row[0] for row in cursor.fetchall()]
+            # Filter out PostgreSQL system tables
+            table_list = [table for table in all_tables if not should_skip_table(table)]
     return table_list
 
 
@@ -135,6 +140,11 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
         )
 
         for table_name in table_names:
+            # Skip PostgreSQL system tables that might cause access issues
+            if should_skip_table(table_name):
+                print(f"# Skipping table `{table_name}` (PostgreSQL system table)")
+                continue
+                
             table_comment = get_table_comment(conn, table_name)
             print(
                 f"""
