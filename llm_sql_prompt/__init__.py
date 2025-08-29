@@ -1,5 +1,6 @@
 from pathlib import Path
 import click
+from importlib.metadata import version as get_version
 from . import sqlite
 from . import postgres
 from . import mysql
@@ -8,6 +9,7 @@ from . import mysql
 @click.command()
 @click.argument(
     "database_url",
+    required=False,
 )
 @click.argument("table_names", required=False, nargs=-1)
 @click.option(
@@ -22,7 +24,13 @@ from . import mysql
     default=False,
     help="Exclude sample data from the generated prompt.",
 )
-def main(database_url, table_names: tuple[str], all: bool, no_data: bool):
+@click.option(
+    "--version",
+    is_flag=True,
+    default=False,
+    help="Show the version and exit.",
+)
+def main(database_url, table_names: tuple[str], all: bool, no_data: bool, version: bool):
     """
     Generate a prompt for a table in a database for use in chatgpt or other LLMs to help write SQL.
 
@@ -30,6 +38,14 @@ def main(database_url, table_names: tuple[str], all: bool, no_data: bool):
 
     - TABLE_NAME Name of the table to generate a prompt for. If not provided, will generate a prompt for all tables in the database.
     """
+    if version:
+        print(get_version("llm-sql-prompt"))
+        return
+    
+    if not database_url:
+        print("Error: DATABASE_URL is required when not using --version")
+        exit(1)
+    
     # Convert the no_data flag to include_data parameter (inverse logic)
     include_data = not no_data
 
