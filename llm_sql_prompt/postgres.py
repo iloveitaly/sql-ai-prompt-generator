@@ -1,21 +1,17 @@
 import logging
-import os
+import sys
 
 import psycopg
 from psycopg import sql
 
 from llm_sql_prompt.util import system_prompt
 
-logging.basicConfig(
-    level=os.environ.get("LOG_LEVEL", "INFO").upper(),
-)
-
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def should_skip_table(table_name: str) -> bool:
     """Check if a table should be skipped due to being a PostgreSQL system table."""
-    return table_name.startswith("pg_stat_") or table_name.startswith("pg_")
+    return table_name.startswith(("pg_stat_", "pg_"))
 
 
 def describe_table_schema(conn, table_name):
@@ -55,19 +51,17 @@ def describe_table_schema(conn, table_name):
 
 def get_table_names(db_url) -> list[str]:
     """Get the table names from the database."""
-    with psycopg.connect(db_url) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
+    with psycopg.connect(db_url) as conn, conn.cursor() as cursor:
+        cursor.execute(
+            """
                 SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema = 'public'
                 ORDER BY table_name
                 """
-            )
-            all_tables = [row[0] for row in cursor.fetchall()]
-            # Filter out PostgreSQL system tables
-            table_list = [table for table in all_tables if not should_skip_table(table)]
+        )
+        all_tables = [row[0] for row in cursor.fetchall()]
+        table_list = [table for table in all_tables if not should_skip_table(table)]
     return table_list
 
 
@@ -105,7 +99,7 @@ def describe_database_and_table(
 
     if not table_names and not all_tables:
         print_table_name_options(db_url)
-        exit(1)
+        sys.exit(1)
 
     if all_tables:
         table_names = get_table_names(db_url)
@@ -121,7 +115,7 @@ def describe_database_and_table(
                 row = cursor.fetchone()
                 if row and row[0]:
                     server_version = str(row[0])
-            except Exception:
+            except psycopg.Error:
                 try:
                     cursor.execute("SELECT version();")
                     row = cursor.fetchone()
@@ -132,8 +126,10 @@ def describe_database_and_table(
                             server_version = parts[1]
                         else:
                             server_version = str(row[0])
-                except Exception:
-                    pass
+                except psycopg.Error:
+                    log.debug(
+                        "Could not determine PostgreSQL server version; using 'unknown'."
+                    )
         if extensions:
             extensions_formatted = "\n".join(
                 f"  - {name} ({version}){f': {comment}' if comment else ''}"
@@ -154,7 +150,7 @@ def describe_database_and_table(
         for table_name in table_names:
             # Skip PostgreSQL system tables that might cause access issues
             if should_skip_table(table_name):
-                logger.info(f"Skipping table `{table_name}` (PostgreSQL system table)")
+                log.info(f"Skipping table `{table_name}` (PostgreSQL system table)")
                 continue
 
             table_comment = get_table_comment(conn, table_name)

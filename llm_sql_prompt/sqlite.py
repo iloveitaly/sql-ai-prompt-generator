@@ -1,5 +1,6 @@
 import sqlite3
 import subprocess
+import sys
 
 from llm_sql_prompt.util import system_prompt
 
@@ -14,6 +15,7 @@ def describe_table_schema(db_filename, table_name):
         ["sqlite3", db_filename, f".schema {table_name}"],
         capture_output=True,
         text=True,
+        check=False,
     )
 
     # Print the output
@@ -27,6 +29,7 @@ def list_sqllite_tables(db_filename):
         ["sqlite3", db_filename, ".tables"],
         capture_output=True,
         text=True,
+        check=False,
     )
 
     # Split the output on whitespace and join with newlines
@@ -35,9 +38,11 @@ def list_sqllite_tables(db_filename):
     return formatted_output
 
 
-def describe_database_and_table(db_url: str, table_names: list[str], all_tables: bool, include_data: bool = True):
+def describe_database_and_table(
+    db_url: str, table_names: list[str], all_tables: bool, include_data: bool = True
+):
     """Main function to describe database tables."""
-    
+
     if not table_names and not all_tables:
         print(
             f"""No table name provided. Please provide a table name from the list below:
@@ -45,7 +50,7 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
 {list_sqllite_tables(db_url)}
             """
         )
-        exit(1)
+        sys.exit(1)
 
     if all_tables:
         table_names = list_sqllite_tables(db_url).split()

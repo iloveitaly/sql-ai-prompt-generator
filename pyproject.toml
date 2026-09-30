@@ -2,9 +2,6 @@
 name = "llm-sql-prompt"
 version = "0.10.0"
 description = "Utility to generate ChatGPT prompts for SQL writing, offering table structure snapshots and sample row data from Postgres and sqlite databases."
-authors = [{ name = "Michael Bianco", email = "mike@mikebian.co" }]
-requires-python = "~=3.11"
-readme = "README.md"
 keywords = [
     "chatgpt",
     "sql",
@@ -14,32 +11,56 @@ keywords = [
     "postgres",
     "sqlite",
 ]
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
 dependencies = [
     "click>=8.1.7,<9",
     "mysql-connector-python>=9.2.0",
     # Psycopg 3 (module name psycopg)
     "psycopg[binary]>=3.1",
 ]
+authors = [{ name = "Michael Bianco", email = "mike@mikebian.co" }]
+urls = { "Repository" = "https://github.com/iloveitaly/llm-sql-prompt", "Homepage" = "https://pypi.org/project/llm-sql-prompt/" }
 
-[project.urls]
-Homepage = "https://pypi.org/project/llm-sql-prompt/"
-
+# additional packaging information: https://packaging.python.org/en/latest/specifications/core-metadata/#license
 [project.scripts]
 llm-sql-prompt = "llm_sql_prompt:main"
 
+[build-system]
+requires = ["uv_build>=0.11.0,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# avoids the src/ directory structure
+module-root = ""
+
 [dependency-groups]
 dev = [
-    "isort>=5.13.2,<10",
-    "black>=24.4.2,<27",
-    "pyright>=1.1.373,<2",
-    "pylint>=3.2.6,<5",
+    "pytest>=8.3.4",
+    "pyright[nodejs]>=1.1.408",
+    "ruff>=0.15.0",
+    "coverage>=7.13.4",
+    "pytest-cov>=7.0.0",
+    "covdefaults>=2.3.0",
+    "beautiful-traceback>=1.0.2",
 ]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[tool.pyright]
+exclude = ["examples/", "playground/", "tmp/", ".venv/", "tests/"]
 
-[tool.isort]
-profile = "black"
-# helpful when copy/pasting GPT code
-float_to_top = true
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report=term-missing --cov-report=html:tmp/htmlcov"
+
+[tool.coverage.run]
+plugins = ["covdefaults"]
+source = ["llm_sql_prompt"]
+
+[tool.coverage.report]
+fail_under = 50

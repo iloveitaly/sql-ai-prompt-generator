@@ -1,15 +1,14 @@
+import importlib.util
+import sys
+from typing import Any
 from urllib.parse import urlparse
 
 from llm_sql_prompt.util import system_prompt
 
-# Try to import MySQL connector, but handle when it's missing
-MYSQL_AVAILABLE = False
-try:
-    import mysql.connector
-    MYSQL_AVAILABLE = True
-except ImportError:
-    # MySQL connector not installed
-    pass
+# Availability probe (no import side effects); the connector itself is
+# imported lazily in connect_to_mysql after check_mysql_available().
+MYSQL_AVAILABLE = importlib.util.find_spec("mysql.connector") is not None
+
 
 def check_mysql_available():
     """Check if MySQL connector is available and raise a helpful error if not."""
@@ -19,35 +18,42 @@ def check_mysql_available():
             "pip install mysql-connector-python"
         )
 
+
 def parse_mysql_url(db_url):
     """Parse a mysql URL into connection parameters."""
     check_mysql_available()
     parsed = urlparse(db_url)
-    username = parsed.username or 'root'
-    password = parsed.password or ''
-    hostname = parsed.hostname or 'localhost'
+    username = parsed.username or "root"
+    password = parsed.password or ""
+    hostname = parsed.hostname or "localhost"
     port = parsed.port or 3306
-    database = parsed.path.strip('/') if parsed.path else None
+    database = parsed.path.strip("/") if parsed.path else None
 
     return {
-        'user': username,
-        'password': password,
-        'host': hostname,
-        'port': port,
-        'database': database
+        "user": username,
+        "password": password,
+        "host": hostname,
+        "port": port,
+        "database": database,
     }
+
 
 def connect_to_mysql(db_url):
     """Connect to MySQL database using URL."""
     check_mysql_available()
+    # Re-import here: check_mysql_available() guarantees the conditional
+    # top-level import succeeded, which static analysis cannot infer.
+    import mysql.connector as mysql_connector
+
     conn_params = parse_mysql_url(db_url)
-    return mysql.connector.connect(**conn_params)
+    return mysql_connector.connect(**conn_params)
+
 
 def describe_table_schema(conn, table_name):
     """Outputs the table schema using SQL, including column comments and FK info if available."""
     database = conn.database
 
-    query = f"""
+    query = """
     SELECT
         COLUMN_NAME,
         DATA_TYPE,
@@ -85,6 +91,7 @@ def describe_table_schema(conn, table_name):
 
         print(line)
 
+
 def get_table_names(db_url) -> list[str]:
     """Get the table names from the database."""
     conn = connect_to_mysql(db_url)
@@ -98,13 +105,14 @@ def get_table_names(db_url) -> list[str]:
             WHERE table_schema = %s AND table_type = 'BASE TABLE'
             ORDER BY TABLE_NAME;
             """,
-            (database,)
+            (database,),
         )
-        table_list = cursor.fetchall()
-        table_list = [table[0] for table in table_list]
+        rows: Any = cursor.fetchall()
+        table_list = [table[0] for table in rows]
 
     conn.close()
     return table_list
+
 
 def print_table_name_options(db_url):
     """Print available table names when none are provided."""
@@ -118,6 +126,7 @@ No table name provided. Please provide a table name from the list below, or use 
 - {formatted_table_list}
         """
     )
+
 
 def get_table_comment(conn, table_name):
     """Get table comment if available."""
@@ -137,6 +146,7 @@ def get_table_comment(conn, table_name):
             return result[0]
 
         return ""
+
 
 def get_foreign_keys(conn, table_name):
     """
@@ -164,12 +174,15 @@ def get_foreign_keys(conn, table_name):
 
     return {row[0]: (row[1], row[2]) for row in results}
 
-def describe_database_and_table(db_url: str, table_names: list[str], all_tables: bool, include_data: bool = True):
+
+def describe_database_and_table(
+    db_url: str, table_names: list[str], all_tables: bool, include_data: bool = True
+):
     """Main function to describe database tables."""
 
     if not table_names and not all_tables:
         print_table_name_options(db_url)
-        exit(1)
+        sys.exit(1)
 
     print(
         f"""
@@ -199,15 +212,18 @@ def describe_database_and_table(db_url: str, table_names: list[str], all_tables:
             if include_data:
                 with conn.cursor() as cursor:
                     # Sample 3 rows
-                    cursor.execute(f"SELECT * FROM {table_name} ORDER BY RAND() LIMIT 3")
-                    sample_rows = cursor.fetchall()
+                    cursor.execute(
+                        f"SELECT * FROM {table_name} ORDER BY RAND() LIMIT 3"
+                    )
+                    sample_rows: Any = cursor.fetchall()
 
                     # Get column names
                     cursor.execute(
-                        f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = %s;",
-                        (table_name, conn.database)
+                        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = %s;",
+                        (table_name, conn.database),
                     )
-                    col_names = [col[0] for col in cursor.fetchall()]
+                    columns: Any = cursor.fetchall()
+                    col_names = [col[0] for col in columns]
 
                     if sample_rows:
                         print(
