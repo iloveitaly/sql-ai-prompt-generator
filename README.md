@@ -38,6 +38,12 @@ From a local sqlite database:
 llm-sql-prompt "$HOME/Library/Application Support/BeeperTexts/index.db" --all
 ```
 
+## Local CLI development
+
+Run `just install_editable` to install this checkout globally in editable mode. Source changes are reflected without reinstalling.
+
+This requires `uv`, `just`, `zsh`, and `jq`. If mise is available, the recipe also updates every installed `pipx:llm-sql-prompt` environment so mise can use the local checkout. Re-run after mise upgrades, which replace those editable installations.
+
 ### Tunneling to a remote port
 
 If you find yourself wanting to tunnel into a remote box and work with a production database, here's some helpful commands so you don't need to remember the weird SSH tunneling syntax:

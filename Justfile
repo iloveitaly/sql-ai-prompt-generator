@@ -1,3 +1,4 @@
+
 # Line recipes and [script] recipes both use zsh with strict mode.
 set shell := ["zsh", "-euo", "pipefail", "-c"]
 set script-interpreter := ["zsh", "-euo", "pipefail"]
@@ -14,6 +15,48 @@ setup:
     # Keep IDE-specific rule files in sync with instructions.md
     if [ -f instructions.md ]; then uvx llm-ide-rules explode; fi
     @echo "activate: source ./.venv/bin/activate"
+
+
+
+# Install this checkout globally in editable mode, including existing mise environments.
+# Re-run after mise upgrades, which replace the editable installation.
+[script]
+install_editable:
+    command -v jq >/dev/null
+    metadata=$(uv run --no-project --python '>=3.12' python -c 'import json, tomllib; from pathlib import Path; p = tomllib.loads(Path("pyproject.toml").read_text())["project"]; print(json.dumps({"name": p["name"], "scripts": list(p.get("scripts", {}))}))')
+    package=$(echo "$metadata" | jq -r '.name')
+    # Python distribution names are normalized for uv/pipx environment directories.
+    env_name=$(echo "$package" | tr '[:upper:]' '[:lower:]' | sed -E 's/[-_.]+/-/g')
+
+    uv tool install --force --editable .
+
+    if ! command -v mise >/dev/null; then
+        echo "mise not on PATH; uv tool only"
+    else
+        installs=$(mise ls --json --installed "pipx:$package")
+        echo "$installs" | jq -r '.[].install_path' | while IFS= read -r install_path; do
+            [ -n "$install_path" ] || continue
+            py=""
+            for candidate in "$install_path/$env_name/bin/python" "$install_path/.mise-uv/.venv/bin/python"; do
+                if [ -x "$candidate" ]; then
+                    py="$candidate"
+                    break
+                fi
+            done
+            if [ -z "$py" ]; then
+                echo "skip $install_path (no venv python)"
+                continue
+            fi
+            echo "editable into mise env: $install_path"
+            uv pip install --python "$py" --reinstall-package "$package" --editable .
+        done
+    fi
+
+    echo "$metadata" | jq -r '.scripts[]' | while IFS= read -r cli; do
+        command -v "$cli"
+    done
+
+
 
 # Start docker services
 docker_up:
@@ -204,3 +247,4 @@ github_repo_set_metadata:
     --description "$(yq  '.project.description' pyproject.toml)" \
     --homepage "$(yq '.project.urls.Repository' pyproject.toml)" \
     --add-topic "$(yq '.project.keywords | join(",")' pyproject.toml)"
+
