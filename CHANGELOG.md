@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.1](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.11.0...v0.11.1) (2026-09-30)
+
+
+### Bug Fixes
+
+* **ci:** add PyPI token, id-token permission, and workflow_dispatch to build and publish workflow ([b92351c](https://github.com/iloveitaly/sql-ai-prompt-generator/commit/b92351c43b00f27384d3e95c0a3cfea09e4b500d))
+
 ## [0.11.0](https://github.com/iloveitaly/sql-ai-prompt-generator/compare/v0.10.0...v0.11.0) (2026-09-30)
 
 

@@ -1,6 +1,6 @@
 [project]
 name = "llm-sql-prompt"
-version = "0.11.0"
+version = "0.11.1"
 description = "Utility to generate ChatGPT prompts for SQL writing, offering table structure snapshots and sample row data from Postgres and sqlite databases."
 keywords = [
     "chatgpt",
